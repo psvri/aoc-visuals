@@ -15,6 +15,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: web
+    - name: Rebase
+      run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git fetch
+          git rebase origin/main
     - name: Install Dependencies
       run: | 
         cargo install --force cargo-make
@@ -27,10 +33,6 @@ jobs:
         cargo make --profile release build-web
     - name: Commit and push files
       run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git fetch
-        git rebase origin/main
         git add scripts/
         git commit -m "Updating pages"
         git push -f origin
