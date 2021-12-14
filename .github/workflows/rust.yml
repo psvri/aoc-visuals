@@ -29,11 +29,10 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        components: cargo-make
         target: wasm32-unknown-unknown
     - name: Build wasm and js
       run: |
-        mkdir -p scripts
+        cargo install --force cargo-make
         cargo make --profile release build-web
     - name: Upload wasm and js
       uses: actions/upload-artifact@v2
