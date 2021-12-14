@@ -21,6 +21,8 @@ jobs:
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
+          ~/.cargo/.crates.toml
+          ~/.cargo/.crates2.json
           target/
           bin/
         key: ${{ runner.os }}-cargo-build-${{ hashFiles('Cargo.toml') }}
@@ -32,7 +34,7 @@ jobs:
         target: wasm32-unknown-unknown
     - name: Build wasm and js
       run: |
-        cargo install cargo-make --version=0.35.7
+        cargo install --force cargo-make --version=0.35.7
         cargo make --profile release build-web
     - name: Upload wasm and js
       uses: actions/upload-artifact@v2
