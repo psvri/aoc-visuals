@@ -32,7 +32,7 @@ jobs:
         target: wasm32-unknown-unknown
     - name: Build wasm and js
       run: |
-        cargo install cargo-make
+        cargo install cargo-make --version=0.35.7
         cargo make --profile release build-web
     - name: Upload wasm and js
       uses: actions/upload-artifact@v2
