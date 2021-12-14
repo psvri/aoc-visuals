@@ -3,7 +3,6 @@ target/
 bin
 .idea
 .vscode
-Cargo.lock
 **/*.rs.bk
 *.pdb
 .history/

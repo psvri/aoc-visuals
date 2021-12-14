@@ -77,6 +77,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: build-output
+        path: scripts
     - name: Commit and push files
       run: |
         git add scripts/
