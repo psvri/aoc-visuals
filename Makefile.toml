@@ -1,47 +1,34 @@
 [env]
 ENV_DIR = {source="${CARGO_MAKE_PROFILE}", default_value = "debug", mapping = {release = "release"}}
-CARGO_TARGET_DIR = {value = "target", condition = {env_not_set = ["CARGO_TARGET_DIR"]}}
-CARGO_WASM_PATH = "${CARGO_TARGET_DIR}/wasm32-unknown-unknown/${ENV_DIR}/${CARGO_MAKE_CRATE_NAME}.wasm"
-CARGO_PROFILE = "release"
+CARGO_WASM_PATH = "target/wasm32-unknown-unknown/${ENV_DIR}/${CARGO_MAKE_CRATE_NAME}.wasm"
 CARGO_MANIFEST_DIR = "${CARGO_MAKE_WORKING_DIRECTORY}"
 
 [env.release]
 CARGO_RELEASE_ARGS = "--release"
 
-[tasks.show-env]
-command = "env"
-
-[tasks.install-target-wasm32-unknown-unknown]
-args = ["target", "install", "wasm32-unknown-unknown"]
-command = "rustup"
-
 [tasks.basic-http-server]
-install_crate = {crate_name = "basic-http-server", binary = "basic-http-server", test_arg="--help"}
+command = "cargo"
+args = ["install", "basic-http-server", "--root=bin"]
 
 [tasks.wasm-bindgen-cli]
-args = ["local-install", "wasm-bindgen-cli", "--version", "0.2.69", "--locked"]
 command = "cargo"
-dependencies = ["cargo-local-install"]
-
-[tasks.cargo-local-install]
-install_crate = {crate_name = "cargo-local-install", binary = "cargo-wasm-bindgen", test_arg="--help"}
+args = ["install", "wasm-bindgen-cli", "--version", "0.2.69", "--root=bin"]
 
 [tasks.cargo-build-web]
-args = ["build", "--target", "wasm32-unknown-unknown", "@@split(CARGO_RELEASE_ARGS, )"]
 command = "cargo"
-dependencies = ["install-target-wasm32-unknown-unknown"]
+args = ["build", "--target", "wasm32-unknown-unknown", "@@split(CARGO_RELEASE_ARGS, )"]
 
 [tasks.build-web]
-args = ["--out-dir", "scripts", "--out-name", "wasm", "--target", "web", "--no-typescript", "${CARGO_WASM_PATH}"]
-command = "./bin/wasm-bindgen"
 dependencies = ["cargo-build-web", "wasm-bindgen-cli"]
+command = "./bin/bin/wasm-bindgen"
+args = ["--out-dir", "scripts", "--out-name", "wasm", "--target", "web", "--no-typescript", "${CARGO_WASM_PATH}"]
 
 [tasks.build-native]
-args = ["build", "@@split(CARGO_RELEASE_ARGS, )"]
 command = "cargo"
+args = ["build", "@@split(CARGO_RELEASE_ARGS, )"]
 
 [tasks.run]
-command = "${CARGO_TARGET_DIR}/${ENV_DIR}/${CARGO_MAKE_BINARY_EXECUTABLE_NAME}"
+command = "target/${ENV_DIR}/${CARGO_MAKE_CRATE_NAME}"
 dependencies = ["build-native"]
 
 [tasks.serve]
@@ -50,4 +37,13 @@ args = ["-x"]
 dependencies = ["build-web", "basic-http-server"]
 
 [tasks.test]
-disabled = true
+command = "cargo"
+args = ["test"]
+
+[tasks.pckg-web]
+script = '''
+mkdir -p page
+cp -r scripts page
+cp index.html page
+cp -r assets page
+'''

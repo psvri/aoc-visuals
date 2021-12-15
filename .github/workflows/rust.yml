@@ -32,15 +32,17 @@ jobs:
       with:
         toolchain: stable
         target: wasm32-unknown-unknown
+    - name: Install cargo make
+      run: cargo install cargo-make --version=0.35.7
     - name: Build wasm and js
       run: |
-        cargo install cargo-make --version=0.35.7
         cargo make --profile release build-web
-    - name: Upload wasm and js
+        cargo make pckg-web
+    - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: build-output
-        path: scripts
+        path: page
 
   test:
     runs-on: ubuntu-latest
@@ -61,29 +63,19 @@ jobs:
       - name: Run tests
         run: cargo test
       
-  push:
+  deploy:
     runs-on: ubuntu-latest
     needs: [build, test]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: web
-    - name: Rebase
-      run: |
-          git config --local pull.rebase true
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git fetch
-          git rebase -Xours origin/main
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
         name: build-output
-        path: scripts
-    - name: Commit and push files
-      run: |
-        git pull
-        git add scripts/
-        git commit -m "Updating pages"
-        git push -f origin
+        path: pages
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.WEB_DEPLOY_KEY }}
+        external_repository:  psvri/aoc-visuals-website 
+        publish_dir: ./pages
+
