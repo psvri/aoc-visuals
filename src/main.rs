@@ -1,7 +1,7 @@
 mod aoc_2018;
 mod commons;
 use bevy::prelude::*;
-use commons::aoc_common::{AOCName, AOCState};
+use commons::aoc_common::{AOCName, AOCState, AocFont};
 use commons::constants::{DAYS, PARTS, WINDOW_HEIGHT, YEARS};
 use commons::fps::FpsPlugin;
 use commons::window_setup::WindowSetup;
@@ -40,22 +40,22 @@ impl MenuData {
     pub fn new(
         commands: &mut Commands,
         button_materials: &Res<ButtonMaterials>,
-        asset_server: &Res<AssetServer>,
+        aoc_font: &Res<AocFont>,
     ) -> Self {
         let mut menu = Self::default();
         let year_header = commands
-            .spawn_bundle(Self::create_text_bundle("Year", (150.0, 0.0), asset_server))
+            .spawn_bundle(Self::create_text_bundle("Year", (150.0, 0.0), aoc_font))
             .id();
         let day_header = commands
-            .spawn_bundle(Self::create_text_bundle("Day", (500.0, 0.0), asset_server))
+            .spawn_bundle(Self::create_text_bundle("Day", (500.0, 0.0), aoc_font))
             .id();
         let part_header = commands
-            .spawn_bundle(Self::create_text_bundle("Part", (950.0, 0.0), asset_server))
+            .spawn_bundle(Self::create_text_bundle("Part", (950.0, 0.0), aoc_font))
             .id();
         let launch_button = Self::create_launch_button(
             (1000.0, WINDOW_HEIGHT / 2.0),
             commands,
-            asset_server,
+            aoc_font,
             button_materials,
             MenuButtonType::Launch,
         );
@@ -69,13 +69,13 @@ impl MenuData {
     fn create_text_bundle(
         text_value: &str,
         pos: (f32, f32),
-        asset_server: &Res<AssetServer>,
+        aoc_font: &Res<AocFont>,
     ) -> TextBundle {
         TextBundle {
             text: Text::with_section(
                 text_value,
                 TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font: aoc_font.font_handle.clone(),
                     font_size: 40.0,
                     color: Color::rgb(0.9, 0.9, 0.9),
                 },
@@ -104,7 +104,7 @@ impl MenuData {
         button_text: &str,
         button_type: MenuButtonType,
         commands: &mut Commands,
-        asset_server: &Res<AssetServer>,
+        aoc_font: &Res<AocFont>,
         button_materials: &Res<ButtonMaterials>,
         pos: (f32, f32),
     ) {
@@ -112,7 +112,7 @@ impl MenuData {
             button_text,
             pos,
             commands,
-            asset_server,
+            aoc_font,
             button_materials,
             button_type,
         );
@@ -123,7 +123,7 @@ impl MenuData {
         button_text: &str,
         pos: (f32, f32),
         commands: &mut Commands,
-        asset_server: &Res<AssetServer>,
+        aoc_font: &Res<AocFont>,
         button_materials: &Res<ButtonMaterials>,
         button_type: MenuButtonType,
     ) -> Entity {
@@ -151,7 +151,7 @@ impl MenuData {
                     text: Text::with_section(
                         button_text,
                         TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
                         },
@@ -167,7 +167,7 @@ impl MenuData {
     fn create_launch_button(
         pos: (f32, f32),
         commands: &mut Commands,
-        asset_server: &Res<AssetServer>,
+        aoc_font: &Res<AocFont>,
         button_materials: &Res<ButtonMaterials>,
         button_type: MenuButtonType,
     ) -> Entity {
@@ -198,7 +198,7 @@ impl MenuData {
                                 TextSection {
                                     value: "Launch".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::rgb(0.9, 0.9, 0.9),
                                     },
@@ -206,7 +206,7 @@ impl MenuData {
                                 TextSection {
                                     value: "\nYear: ".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::rgb(0.9, 0.9, 0.9),
                                     },
@@ -214,7 +214,7 @@ impl MenuData {
                                 TextSection {
                                     value: "".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::GOLD,
                                     },
@@ -222,7 +222,7 @@ impl MenuData {
                                 TextSection {
                                     value: "\nDay: ".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::rgb(0.9, 0.9, 0.9),
                                     },
@@ -230,7 +230,7 @@ impl MenuData {
                                 TextSection {
                                     value: "".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::GOLD,
                                     },
@@ -238,7 +238,7 @@ impl MenuData {
                                 TextSection {
                                     value: "\nPart: ".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::rgb(0.9, 0.9, 0.9),
                                     },
@@ -246,7 +246,7 @@ impl MenuData {
                                 TextSection {
                                     value: "".to_string(),
                                     style: TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font: aoc_font.font_handle.clone(),
                                         font_size: 40.0,
                                         color: Color::GOLD,
                                     },
@@ -278,17 +278,17 @@ fn cleanup_vec_entity(commands: &mut Commands, buttons: &[Entity]) {
 
 fn setup_menu(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    aoc_font: Res<AocFont>,
     button_materials: Res<ButtonMaterials>,
 ) {
     commands.spawn_bundle(UiCameraBundle::default());
-    let mut menu_data = MenuData::new(&mut commands, &button_materials, &asset_server);
+    let mut menu_data = MenuData::new(&mut commands, &button_materials, &aoc_font);
     for (index, year) in YEARS.iter().enumerate() {
         menu_data.insert_button(
             &year.to_string(),
             MenuButtonType::Year,
             &mut commands,
-            &asset_server,
+            &aoc_font,
             &button_materials,
             (100.0, 50.0 * (index + 1) as f32),
         );
@@ -298,7 +298,7 @@ fn setup_menu(
             &day.to_string(),
             MenuButtonType::Day,
             &mut commands,
-            &asset_server,
+            &aoc_font,
             &button_materials,
             (
                 300.0 + 150.0 * (index as f32 / 12.0).floor(),
@@ -311,7 +311,7 @@ fn setup_menu(
             &day.to_string(),
             MenuButtonType::Part,
             &mut commands,
-            &asset_server,
+            &aoc_font,
             &button_materials,
             (900.0, 50.0 * (index + 1) as f32),
         );
@@ -388,9 +388,10 @@ fn update_launch_botton(
 
 fn setup_app() -> AppBuilder {
     let mut app = App::build();
+    app.add_startup_system(AocFont::setup_font_resource.system().label("font_init"));
+    app.add_plugin(FpsPlugin);
     app.add_plugin(WindowSetup);
     app.add_plugins(DefaultPlugins);
-    app.add_plugin(FpsPlugin);
     app.init_resource::<ButtonMaterials>();
     #[cfg(target_arch = "wasm32")]
     app.add_plugin(bevy_webgl2::WebGL2Plugin);

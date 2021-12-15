@@ -17,6 +17,7 @@ impl Plugin for FpsPlugin {
 struct FpsText;
 
 fn setup_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let handle = asset_server.load(FONT_PATH);
     commands
         .spawn_bundle(Text2dBundle {
             // Use `Text` directly
@@ -26,7 +27,7 @@ fn setup_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "FPS: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: handle.clone(),
                             font_size: 40.0,
                             color: Color::WHITE,
                         },
@@ -34,7 +35,7 @@ fn setup_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: handle,
                             font_size: 40.0,
                             color: Color::GOLD,
                         },

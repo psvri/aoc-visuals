@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bevy::prelude::*;
 
-use crate::commons::aoc_common::{AOCName, AOCState, InputLines};
+use crate::commons::aoc_common::{AOCName, AOCState, AocFont, InputLines};
 use crate::commons::constants::WINDOW_WIDTH;
 
 #[derive(Default)]
@@ -110,7 +110,7 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
 fn app_setup_part1(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>,
+    aoc_font: Res<AocFont>,
 ) {
     commands
         .spawn_bundle(SpriteBundle {
@@ -136,7 +136,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "Duals: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::RED,
                         },
@@ -144,7 +144,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::RED,
                         },
@@ -152,7 +152,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "\nTriplets: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::GREEN,
                         },
@@ -160,7 +160,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::GREEN,
                         },
@@ -168,7 +168,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "\nChecksum: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::WHITE,
                         },
@@ -176,7 +176,7 @@ fn app_setup_part1(
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::WHITE,
                         },
@@ -223,7 +223,7 @@ fn update_sprite_part1(conuts: Res<Counts>, mut query: Query<(&mut Sprite, &AOCN
     }
 }
 
-fn app_setup_part2(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn app_setup_part2(mut commands: Commands, aoc_font: Res<AocFont>) {
     commands
         .spawn_bundle(Text2dBundle {
             text: Text {
@@ -232,7 +232,7 @@ fn app_setup_part2(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "Answer is: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::WHITE,
                         },
@@ -240,7 +240,7 @@ fn app_setup_part2(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: aoc_font.font_handle.clone(),
                             font_size: 40.0,
                             color: Color::GOLD,
                         },

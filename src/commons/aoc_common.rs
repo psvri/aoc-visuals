@@ -1,6 +1,10 @@
 use std::io::BufRead;
 use std::io::BufReader;
 
+use bevy::prelude::*;
+
+use super::constants;
+
 #[derive(PartialEq, Eq, Clone, Hash, Debug)]
 pub struct AOCState {
     pub year: u16,
@@ -49,5 +53,17 @@ impl InputLines {
         } else {
             None
         }
+    }
+}
+
+pub struct AocFont {
+    pub font_handle: Handle<Font>,
+}
+
+impl AocFont {
+    pub fn setup_font_resource(mut commands: Commands, asset_server: Res<AssetServer>) {
+        commands.insert_resource(Self {
+            font_handle: asset_server.load(constants::FONT_PATH),
+        });
     }
 }

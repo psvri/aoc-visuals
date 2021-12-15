@@ -1,4 +1,4 @@
-use crate::commons::aoc_common::{AOCState, BorderSize, InputLines, ScalableObject};
+use crate::commons::aoc_common::{AOCState, AocFont, BorderSize, InputLines, ScalableObject};
 use crate::commons::constants::WINDOW_WIDTH;
 use bevy::prelude::*;
 use std::collections::HashSet;
@@ -84,7 +84,7 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
 fn app_setup(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>,
+    aoc_font: Res<AocFont>,
 ) {
     commands.insert_resource(Answer { frequency: 0 });
     commands
@@ -92,7 +92,7 @@ fn app_setup(
             text: Text::with_section(
                 "This text is in the 2D scene.",
                 TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font: aoc_font.font_handle.clone(),
                     font_size: 40.0,
                     color: Color::WHITE,
                 },
