@@ -12,7 +12,7 @@ args = ["install", "basic-http-server", "--root=bin"]
 
 [tasks.wasm-bindgen-cli]
 command = "cargo"
-args = ["install", "wasm-bindgen-cli", "--version", "0.2.69", "--root=bin"]
+args = ["install", "wasm-bindgen-cli", "--version", "0.2.78", "--root=bin"]
 
 [tasks.cargo-build-web]
 command = "cargo"
@@ -21,7 +21,7 @@ args = ["build", "--target", "wasm32-unknown-unknown", "@@split(CARGO_RELEASE_AR
 [tasks.build-web]
 dependencies = ["cargo-build-web", "wasm-bindgen-cli"]
 command = "./bin/bin/wasm-bindgen"
-args = ["--out-dir", "scripts", "--out-name", "wasm", "--target", "web", "--no-typescript", "${CARGO_WASM_PATH}"]
+args = ["--out-dir", "scripts", "--out-name", "wasm", "--target", "web", "${CARGO_WASM_PATH}"]
 
 [tasks.build-native]
 command = "cargo"

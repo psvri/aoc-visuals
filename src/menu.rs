@@ -4,8 +4,11 @@ use crate::commons::{
 };
 use bevy::prelude::*;
 
-pub fn setup_app(mut app: AppBuilder) -> AppBuilder {
-    app.init_resource::<ButtonMaterials>();
+const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+
+pub fn setup_app(mut app: App) -> App {
     app.add_system_set(
         SystemSet::on_enter(AOCState {
             year: 0,
@@ -20,8 +23,8 @@ pub fn setup_app(mut app: AppBuilder) -> AppBuilder {
             day: 0,
             part: 1,
         })
-        .with_system(menu.system())
-        .with_system(update_launch_botton.system()),
+        .with_system(menu)
+        .with_system(update_launch_botton),
     );
     app.add_system_set(
         SystemSet::on_exit(AOCState {
@@ -34,23 +37,7 @@ pub fn setup_app(mut app: AppBuilder) -> AppBuilder {
     app
 }
 
-struct ButtonMaterials {
-    normal: Handle<ColorMaterial>,
-    hovered: Handle<ColorMaterial>,
-    pressed: Handle<ColorMaterial>,
-}
-
-impl FromWorld for ButtonMaterials {
-    fn from_world(world: &mut World) -> Self {
-        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
-        ButtonMaterials {
-            normal: materials.add(Color::rgb(0.15, 0.15, 0.15).into()),
-            hovered: materials.add(Color::rgb(0.25, 0.25, 0.25).into()),
-            pressed: materials.add(Color::rgb(0.35, 0.75, 0.35).into()),
-        }
-    }
-}
-
+#[derive(Component)]
 enum MenuButtonType {
     Year,
     Day,
@@ -67,7 +54,6 @@ struct MenuData {
 impl MenuData {
     pub fn new(
         commands: &mut Commands,
-        button_materials: &Res<ButtonMaterials>,
         aoc_font: &Res<AocFont>,
     ) -> Self {
         let mut menu = Self::default();
@@ -84,7 +70,6 @@ impl MenuData {
             (1000.0, WINDOW_HEIGHT / 2.0),
             commands,
             aoc_font,
-            button_materials,
             MenuButtonType::Launch,
         );
         menu.buttons.push(year_header);
@@ -133,7 +118,6 @@ impl MenuData {
         button_type: MenuButtonType,
         commands: &mut Commands,
         aoc_font: &Res<AocFont>,
-        button_materials: &Res<ButtonMaterials>,
         pos: (f32, f32),
     ) {
         let button_entity = Self::create_button_entity(
@@ -141,7 +125,6 @@ impl MenuData {
             pos,
             commands,
             aoc_font,
-            button_materials,
             button_type,
         );
         self.buttons.push(button_entity);
@@ -152,7 +135,6 @@ impl MenuData {
         pos: (f32, f32),
         commands: &mut Commands,
         aoc_font: &Res<AocFont>,
-        button_materials: &Res<ButtonMaterials>,
         button_type: MenuButtonType,
     ) -> Entity {
         commands
@@ -171,7 +153,7 @@ impl MenuData {
                     },
                     ..Default::default()
                 },
-                material: button_materials.normal.clone(),
+                color: NORMAL_BUTTON.into(),
                 ..Default::default()
             })
             .with_children(|parent| {
@@ -196,7 +178,6 @@ impl MenuData {
         pos: (f32, f32),
         commands: &mut Commands,
         aoc_font: &Res<AocFont>,
-        button_materials: &Res<ButtonMaterials>,
         button_type: MenuButtonType,
     ) -> Entity {
         commands
@@ -215,7 +196,7 @@ impl MenuData {
                     },
                     ..Default::default()
                 },
-                material: button_materials.normal.clone(),
+                color: NORMAL_BUTTON.into(),
                 ..Default::default()
             })
             .with_children(|parent| {
@@ -307,17 +288,15 @@ fn cleanup_vec_entity(commands: &mut Commands, buttons: &[Entity]) {
 fn setup_menu(
     mut commands: Commands,
     aoc_font: Res<AocFont>,
-    button_materials: Res<ButtonMaterials>,
 ) {
     commands.spawn_bundle(UiCameraBundle::default());
-    let mut menu_data = MenuData::new(&mut commands, &button_materials, &aoc_font);
+    let mut menu_data = MenuData::new(&mut commands, &aoc_font);
     for (index, year) in YEARS.iter().enumerate() {
         menu_data.insert_button(
             &year.to_string(),
             MenuButtonType::Year,
             &mut commands,
             &aoc_font,
-            &button_materials,
             (100.0, 50.0 * (index + 1) as f32),
         );
     }
@@ -327,7 +306,6 @@ fn setup_menu(
             MenuButtonType::Day,
             &mut commands,
             &aoc_font,
-            &button_materials,
             (
                 300.0 + 150.0 * (index as f32 / 12.0).floor(),
                 50.0 * ((index as f32 % 12.0) + 1.0) as f32,
@@ -340,7 +318,6 @@ fn setup_menu(
             MenuButtonType::Part,
             &mut commands,
             &aoc_font,
-            &button_materials,
             (900.0, 50.0 * (index + 1) as f32),
         );
     }
@@ -351,11 +328,10 @@ fn setup_menu(
 fn menu(
     mut state: ResMut<State<AOCState>>,
     mut menu_selection: ResMut<MenuData>,
-    button_materials: Res<ButtonMaterials>,
     mut query_parent: Query<
         (
             &Interaction,
-            &mut Handle<ColorMaterial>,
+            &mut UiColor,
             &MenuButtonType,
             &Children,
         ),
@@ -363,7 +339,7 @@ fn menu(
     >,
     query_child: Query<&Text>,
 ) {
-    for (interaction, mut material, name, children) in query_parent.iter_mut() {
+    for (interaction, mut color, name, children) in query_parent.iter_mut() {
         let mut value: &str = "0";
         for &child in children.iter() {
             value = &query_child.get(child).unwrap().sections[0].value;
@@ -371,7 +347,7 @@ fn menu(
 
         match (*interaction, &name) {
             (Interaction::Clicked, MenuButtonType::Launch) => {
-                *material = button_materials.pressed.clone();
+                *color = PRESSED_BUTTON.into();
                 println!("launching state: {:?}", menu_selection.problem);
                 state
                     .set(AOCState {
@@ -382,22 +358,22 @@ fn menu(
                     .unwrap();
             }
             (Interaction::Clicked, MenuButtonType::Year) => {
-                *material = button_materials.pressed.clone();
+                *color = PRESSED_BUTTON.into();
                 menu_selection.problem.0 = value.parse::<u16>().unwrap();
             }
             (Interaction::Clicked, MenuButtonType::Day) => {
-                *material = button_materials.pressed.clone();
+                *color = PRESSED_BUTTON.into();
                 menu_selection.problem.1 = value.parse::<u8>().unwrap();
             }
             (Interaction::Clicked, MenuButtonType::Part) => {
-                *material = button_materials.pressed.clone();
+                *color = PRESSED_BUTTON.into();
                 menu_selection.problem.2 = value.parse::<u8>().unwrap();
             }
             (Interaction::Hovered, _) => {
-                *material = button_materials.hovered.clone();
+                *color = HOVERED_BUTTON.into();
             }
             (Interaction::None, _) => {
-                *material = button_materials.normal.clone();
+                *color = NORMAL_BUTTON.into();
             }
         }
     }
@@ -407,7 +383,7 @@ fn update_launch_botton(
     menu_selection: ResMut<MenuData>,
     mut query: Query<&mut Text, With<AOCName>>,
 ) {
-    let mut text = query.single_mut().unwrap();
+    let mut text = query.single_mut();
     let (year, day, month) = menu_selection.problem;
     text.sections[2].value = year.to_string();
     text.sections[4].value = day.to_string();

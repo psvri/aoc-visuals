@@ -7,14 +7,12 @@ use commons::aoc_common::{AOCState, AocFont};
 use commons::fps::FpsPlugin;
 use commons::window_setup::WindowSetup;
 
-fn setup() -> AppBuilder {
-    let mut app = App::build();
+fn setup() -> App {
+    let mut app = App::new();
     app.add_startup_system(AocFont::setup_font_resource.system().label("font_init"));
     app.add_plugin(FpsPlugin);
     app.add_plugin(WindowSetup);
     app.add_plugins(DefaultPlugins);
-    #[cfg(target_arch = "wasm32")]
-    app.add_plugin(bevy_webgl2::WebGL2Plugin);
     app.add_state(AOCState {
         year: 0,
         day: 0,

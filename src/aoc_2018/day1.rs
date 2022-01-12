@@ -21,11 +21,12 @@ fn step_calculate_part_2(answer: &mut Answer, change: i32, vistied: &mut Visited
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Component )]
 pub struct Answer {
     pub frequency: i32,
 }
 
+#[derive(Component)]
 pub struct VisitedNodes {
     pub vistied_frequencies: HashSet<i32>,
     pub found: bool,
@@ -43,14 +44,14 @@ impl VisitedNodes {
     }
 }
 
-pub fn setup(mut app: AppBuilder) -> AppBuilder {
+pub fn setup(mut app: App) -> App {
     app.add_system_set(
         SystemSet::on_enter(AOCState {
             year: 2018,
             day: 1,
             part: 1,
         })
-        .with_system(app_setup.system()),
+        .with_system(app_setup),
     );
     app.add_system_set(
         SystemSet::on_update(AOCState {
@@ -58,8 +59,8 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 1,
             part: 1,
         })
-        .with_system(step_part1_system.system())
-        .with_system(scale_sprite.system()),
+        .with_system(step_part1_system)
+        .with_system(scale_sprite),
     );
     app.add_system_set(
         SystemSet::on_enter(AOCState {
@@ -67,7 +68,7 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 1,
             part: 2,
         })
-        .with_system(app_setup.system()),
+        .with_system(app_setup),
     );
     app.add_system_set(
         SystemSet::on_update(AOCState {
@@ -75,8 +76,8 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 1,
             part: 2,
         })
-        .with_system(step_part2_system.system())
-        .with_system(scale_sprite.system()),
+        .with_system(step_part2_system)
+        .with_system(scale_sprite),
     );
     app
 }
@@ -111,9 +112,12 @@ fn app_setup(
         .insert(ScalableObject);
     commands
         .spawn_bundle(SpriteBundle {
-            material: materials.add(Color::rgb(1.0, 0.0, 1.0).into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
-            sprite: Sprite::new(Vec2::new(10.0, 10.0)),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(10.0, 10.0)),
+                color: Color::rgb(1.0, 0.0, 1.0),
+                ..Default::default()
+            },
             ..Default::default()
         })
         .insert(ScalableObject);
@@ -124,7 +128,7 @@ fn step_part1_system(
     mut query: Query<(&mut Text, &mut InputLines)>,
     mut border_size: ResMut<BorderSize>,
 ) {
-    let (mut text, mut input_line) = query.single_mut().unwrap();
+    let (mut text, mut input_line) = query.single_mut();
     if let Some(i) = input_line.next(false) {
         step_calculate_part_1(&mut answer, string_to_i32(i));
         border_size.current_y = scale_log_value(answer.frequency as f32);
@@ -137,7 +141,7 @@ fn step_part2_system(
     mut query: Query<(&mut Text, &mut InputLines, &mut VisitedNodes)>,
     mut border_size: ResMut<BorderSize>,
 ) {
-    let (mut text, mut input_line, mut vistied_nodes) = query.single_mut().unwrap();
+    let (mut text, mut input_line, mut vistied_nodes) = query.single_mut();
     for _ in 0..50 {
         if !vistied_nodes.found {
             if let Some(i) = input_line.next(true) {
@@ -150,8 +154,8 @@ fn step_part2_system(
 }
 
 fn scale_sprite(answer: Res<Answer>, mut query: Query<&mut Sprite, With<ScalableObject>>) {
-    let mut sprite = query.single_mut().unwrap();
-    sprite.size = Vec2::new(100.0, scale_log_value(answer.frequency as f32));
+    let mut sprite = query.single_mut();
+    sprite.custom_size = Some(Vec2::new(100.0, scale_log_value(answer.frequency as f32)));
 }
 
 fn scale_log_value(data: f32) -> f32 {

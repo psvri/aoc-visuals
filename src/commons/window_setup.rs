@@ -9,7 +9,7 @@ use bevy::{
 pub struct WindowSetup;
 
 impl Plugin for WindowSetup {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.insert_resource(WindowDescriptor {
             width: WINDOW_WIDTH,
             height: WINDOW_HEIGHT,
@@ -17,10 +17,10 @@ impl Plugin for WindowSetup {
             vsync: true,
             ..Default::default()
         });
-        app.add_startup_system(camera_setup.system());
+        app.add_startup_system(camera_setup);
         app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)));
-        app.add_system(camera_zoom.system());
-        app.add_system(scale_with_zoom.system());
+        app.add_system(camera_zoom);
+        //app.add_system(scale_with_zoom.system());
         app.insert_resource(BorderSize {
             max_x: WINDOW_WIDTH / 2.0,
             max_y: WINDOW_HEIGHT / 2.0,
@@ -41,7 +41,7 @@ fn camera_zoom(
     window: Res<WindowDescriptor>,
     mut query: Query<(&mut OrthographicProjection, &mut Camera), With<AOCName>>,
 ) {
-    let (mut projection, mut camera) = query.single_mut().unwrap();
+    let (mut projection, mut camera) = query.single_mut();
     if border_size.current_x > border_size.max_x {
         projection.scale = 1.0
             + ((border_size.current_x as f32 - border_size.max_x as f32)
@@ -55,7 +55,7 @@ fn camera_zoom(
     camera.projection_matrix = projection.get_projection_matrix();
 }
 
-fn scale_with_zoom(
+/*fn scale_with_zoom(
     border_size: Res<BorderSize>,
     mut query: Query<&mut Sprite, With<ScalableObject>>,
 ) {
@@ -80,4 +80,4 @@ fn scale_with_zoom(
             sprite.size[1] *= 10.0;
         }
     }
-}
+}*/

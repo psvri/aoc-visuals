@@ -69,14 +69,14 @@ fn step_calculate_part_2(answer: &mut BoxIds, id: String) {
     answer.ids.push(id);
 }
 
-pub fn setup(mut app: AppBuilder) -> AppBuilder {
+pub fn setup(mut app: App) -> App {
     app.add_system_set(
         SystemSet::on_enter(AOCState {
             year: 2018,
             day: 2,
             part: 1,
         })
-        .with_system(app_setup_part1.system()),
+        .with_system(app_setup_part1),
     );
     app.add_system_set(
         SystemSet::on_update(AOCState {
@@ -84,9 +84,9 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 2,
             part: 1,
         })
-        .with_system(step_part1.system())
-        .with_system(update_sprite_part1.system())
-        .with_system(update_text_part1.system()),
+        .with_system(step_part1)
+        .with_system(update_sprite_part1)
+        .with_system(update_text_part1),
     );
     app.add_system_set(
         SystemSet::on_enter(AOCState {
@@ -94,7 +94,7 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 2,
             part: 2,
         })
-        .with_system(app_setup_part2.system()),
+        .with_system(app_setup_part2),
     );
     app.add_system_set(
         SystemSet::on_update(AOCState {
@@ -102,7 +102,7 @@ pub fn setup(mut app: AppBuilder) -> AppBuilder {
             day: 2,
             part: 2,
         })
-        .with_system(step_part2.system()),
+        .with_system(step_part2),
     );
     app
 }
@@ -114,17 +114,23 @@ fn app_setup_part1(
 ) {
     commands
         .spawn_bundle(SpriteBundle {
-            material: materials.add(Color::RED.into()),
             transform: Transform::from_xyz(-WINDOW_WIDTH / 4.0, 0.0, 0.0),
-            sprite: Sprite::new(Vec2::new(100.0, 0.0)),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(100.0, 0.0)),
+                color: Color::RED,
+                ..Default::default()
+            },
             ..Default::default()
         })
         .insert(AOCName("twos".to_owned()));
     commands
         .spawn_bundle(SpriteBundle {
-            material: materials.add(Color::GREEN.into()),
             transform: Transform::from_xyz(WINDOW_WIDTH / 4.0, 0.0, 0.0),
-            sprite: Sprite::new(Vec2::new(100.0, 0.0)),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(100.0, 0.0)),
+                color: Color::GREEN,
+                ..Default::default()
+            },
             ..Default::default()
         })
         .insert(AOCName("threes".to_owned()));
@@ -199,14 +205,14 @@ fn app_setup_part1(
 }
 
 fn step_part1(mut conuts: ResMut<Counts>, mut query: Query<&mut InputLines>) {
-    let mut line = query.single_mut().unwrap();
+    let mut line = query.single_mut();
     if let Some(x) = line.next(false) {
         step_calculate_part_1(&mut conuts, x)
     }
 }
 
 fn update_text_part1(conuts: Res<Counts>, mut query: Query<&mut Text, With<AOCName>>) {
-    let mut text = query.single_mut().unwrap();
+    let mut text = query.single_mut();
     text.sections[1].value = conuts.twos.to_string();
     text.sections[3].value = conuts.threes.to_string();
     text.sections[5].value = (conuts.twos * conuts.threes).to_string();
@@ -215,10 +221,14 @@ fn update_text_part1(conuts: Res<Counts>, mut query: Query<&mut Text, With<AOCNa
 fn update_sprite_part1(conuts: Res<Counts>, mut query: Query<(&mut Sprite, &AOCName)>) {
     for (mut sprite, name) in query.iter_mut() {
         if name.0 == "twos" {
-            sprite.size.y = conuts.twos as f32;
+            if let Some(mut size) = sprite.custom_size {
+                size.y = conuts.twos as f32;
+            }
         }
         if name.0 == "threes" {
-            sprite.size.y = conuts.threes as f32;
+            if let Some(mut size) = sprite.custom_size {
+                size.y = conuts.threes as f32;
+            }
         }
     }
 }
@@ -261,7 +271,7 @@ fn app_setup_part2(mut commands: Commands, aoc_font: Res<AocFont>) {
 }
 
 fn step_part2(mut counts: ResMut<BoxIds>, mut query: Query<(&mut InputLines, &mut Text)>) {
-    let (mut line, mut text) = query.single_mut().unwrap();
+    let (mut line, mut text) = query.single_mut();
     if let Some(x) = line.next(false) {
         step_calculate_part_2(&mut counts, x.to_string());
         if counts.common_id.is_empty() {

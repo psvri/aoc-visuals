@@ -6,14 +6,15 @@ use bevy::{
 pub struct FpsPlugin;
 
 impl Plugin for FpsPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-            .add_startup_system(setup_fps.system())
-            .add_system(fps_update_system.system());
+            .add_startup_system(setup_fps)
+            .add_system(fps_update_system);
     }
 }
 
 // A unit struct to help identify the FPS UI component, since there may be many Text components
+#[derive(Component)]
 struct FpsText;
 
 fn setup_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -44,8 +45,8 @@ fn setup_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..Default::default()
             },
             transform: Transform::from_xyz(
-                (WINDOW_WIDTH / 2.0) - 20.0,
-                (WINDOW_HEIGHT / 2.0) - 50.0,
+                (WINDOW_WIDTH / 2.0) - 175.0,
+                (WINDOW_HEIGHT / 2.0) - 30.0,
                 0.0,
             ),
             ..Default::default()

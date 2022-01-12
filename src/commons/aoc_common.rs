@@ -19,10 +19,13 @@ pub struct BorderSize {
     pub current_y: f32,
 }
 
+#[derive(Component)]
 pub struct ScalableObject;
 
+#[derive(Component)]
 pub struct AOCName(pub String);
 
+#[derive(Component)]
 pub struct InputLines {
     pub input_lines: Vec<String>,
     pub read_pos: usize,
@@ -53,6 +56,10 @@ impl InputLines {
         } else {
             None
         }
+    }
+
+    pub fn refresh(&mut self) {
+        self.read_pos = 0;
     }
 }
 
